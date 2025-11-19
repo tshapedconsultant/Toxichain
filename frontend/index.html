@@ -305,6 +305,20 @@
       try {
         await ensureWalletConnected();
         const provider = new ethers.BrowserProvider(window.ethereum);
+        
+        // Check network
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId);
+        console.log('Connected to network, Chain ID:', chainId);
+        
+        // Check if contract exists
+        const code = await provider.getCode(contractAddress);
+        if (code === '0x' || code === '0x0') {
+          setStatus('❌ Contract not found at address ' + contractAddress + '. Make sure contract is deployed and address is correct.', false, true);
+          viewMessageBtn.disabled = false;
+          return;
+        }
+        
         const contract = new ethers.Contract(contractAddress, contractABI, provider);
         const currentMessage = await contract.mensaje();
         currentMessageDiv.innerText = currentMessage ? `Current message: ${currentMessage}` : 'No message stored.';
