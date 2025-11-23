@@ -69,7 +69,7 @@ This architecture ensures that sensitive or inappropriate content is filtered **
 
 The following diagram illustrates how ToxiChain AI processes messages before blockchain submission:
 
-![ToxiChain AI Architecture](images/architecture-flow.png)
+![ToxiChain AI Architecture](images/ToxiChain.jpg)
 
 **Flow:**
 1. User submits message through browser interface
