@@ -102,7 +102,7 @@
   <div class="container">
     <h2>Interact with your Smart Contract</h2>
     <form id="messageForm" autocomplete="off">
-      <input type="text" id="messageInput" placeholder="New message" maxlength="80" required>
+      <input type="text" id="messageInput" placeholder="New message" maxlength="280" required>
       <button type="submit" id="sendBtn">Send</button>
     </form>
     <button id="viewMessageBtn">View current message</button>
@@ -146,9 +146,16 @@
     const viewMessageBtn = document.getElementById('viewMessageBtn');
     const messageInput = document.getElementById('messageInput');
 
-    // Utility to show status messages
+    // Utility to show status messages (XSS-safe)
     function setStatus(msg, loading = false, error = false) {
-      statusDiv.innerHTML = msg + (loading ? '<span class="spinner"></span>' : '');
+      // Use textContent to prevent XSS attacks
+      statusDiv.textContent = msg;
+      // Add spinner safely if loading
+      if (loading) {
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner';
+        statusDiv.appendChild(spinner);
+      }
       statusDiv.style.color = error ? '#dc2626' : '#64748b';
     }
 
@@ -264,8 +271,14 @@
     document.getElementById('messageForm').onsubmit = async (e) => {
       e.preventDefault();
       const message = messageInput.value.trim();
+      const MAX_MESSAGE_LENGTH = 280; // Must match contract constant
+      
       if (!message) {
         setStatus('Please enter a message.', false, true);
+        return;
+      }
+      if (message.length > MAX_MESSAGE_LENGTH) {
+        setStatus(`Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.`, false, true);
         return;
       }
       if (await shouldBlockMessageBySentiment(message)) {
