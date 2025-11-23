@@ -6,6 +6,19 @@ A decentralized application (dApp) that prevents toxic or offensive content from
 
 **ToxiChain AI** is a full-stack Web3 application that combines AI-powered sentiment analysis with Ethereum smart contracts to ensure only appropriate messages are immutably recorded on-chain. The system filters messages in real-time before blockchain submission, supporting multi-language detection (English + Spanish) and handling obfuscation patterns and leetspeak.
 
+## Architecture
+
+The following diagram illustrates how ToxiChain AI processes messages before blockchain submission:
+
+![ToxiChain AI Architecture](images/architecture-flow.png)
+
+**Flow:**
+1. User submits message through browser interface
+2. Frontend normalizes text (lowercase, accents, leetspeak detection)
+3. TensorFlow.js toxicity model analyzes content (client-side)
+4. If approved, MetaMask signs transaction via Ethers.js
+5. Smart contract stores message on blockchain (Hardhat network)
+
 ## Features
 
 - ✅ **AI-Powered Content Moderation**: Real-time toxicity detection using TensorFlow.js
@@ -14,6 +27,24 @@ A decentralized application (dApp) that prevents toxic or offensive content from
 - ✅ **Blockchain Integration**: Ethereum smart contract for immutable message storage
 - ✅ **MetaMask Wallet**: Seamless Web3 wallet connectivity
 - ✅ **Responsive UI**: Modern, user-friendly interface
+
+## Examples
+
+### AI Filter in Action
+
+The system successfully blocks toxic content before it reaches the blockchain:
+
+![AI Filter Blocking Toxic Content](images/example-filter-blocking.png)
+
+*Example: The AI filter detected and blocked an offensive message, preventing it from being stored on-chain.*
+
+### Successful Transaction
+
+When content passes the AI filter, users can submit messages via MetaMask:
+
+![MetaMask Transaction](images/example-metamask-transaction.png)
+
+*Example: A valid message transaction being signed through MetaMask on the Hardhat network.*
 
 ## Tech Stack
 
@@ -35,8 +66,12 @@ working-dapp/
 │   └── MiContrato.sol          # Solidity smart contract
 ├── frontend/
 │   └── index.html              # Web interface with AI filtering
+├── images/                     # Documentation images
+│   ├── architecture-flow.png   # System architecture diagram
+│   └── example-*.png           # Example screenshots
 ├── scripts/
-│   └── deploy.js               # Deployment script
+│   ├── deploy.js               # Deployment script
+│   └── check-contract.js       # Contract verification script
 ├── test/
 │   └── Lock.js                 # Test files
 ├── hardhat.config.js            # Hardhat configuration
