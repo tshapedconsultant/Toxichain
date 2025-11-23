@@ -69,7 +69,7 @@ This architecture ensures that sensitive or inappropriate content is filtered **
 
 The following diagram illustrates how ToxiChain AI processes messages before blockchain submission:
 
-![ToxiChain AI Architecture](images/architecture-flow.png)
+<!-- ![ToxiChain AI Architecture](images/architecture-flow.png) -->
 
 **Flow:**
 1. User submits message through browser interface
@@ -94,17 +94,17 @@ The following diagram illustrates how ToxiChain AI processes messages before blo
 
 The system successfully blocks toxic content before it reaches the blockchain:
 
-![AI Filter Blocking Toxic Content](images/example-filter-blocking.png)
+<!-- ![AI Filter Blocking Toxic Content](images/example-filter-blocking.png) -->
 
-*Example: The AI filter detected and blocked an offensive message, preventing it from being stored on-chain.*
+**Example:** The AI filter detected and blocked an offensive message (e.g., "maricon", "motherfucker"), preventing it from being stored on-chain. The interface displays: "Please rephrase your message to be more constructive (AI filter)."
 
 ### Successful Transaction
 
 When content passes the AI filter, users can submit messages via MetaMask:
 
-![MetaMask Transaction](images/example-metamask-transaction.png)
+<!-- ![MetaMask Transaction](images/example-metamask-transaction.png) -->
 
-*Example: A valid message transaction being signed through MetaMask on the Hardhat network.*
+**Example:** A valid message transaction being signed through MetaMask on the Hardhat network. The transaction shows the contract address, function call (`setMensaje`), and network fee (0 ETH on testnet).
 
 ## Tech Stack
 
