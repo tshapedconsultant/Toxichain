@@ -249,7 +249,7 @@ npx hardhat clean
 
 ## License
 
-MIT License - feel free to use this project for learning and development.
+Copyright © 2025 **Andrés Lage** ([tshapedconsultant](https://github.com/tshapedconsultant)). Licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details. Unlike MIT, GPL-3.0 requires derivative works to be distributed under the same license with source available.
 
 
 
