@@ -1,0 +1,20 @@
+{
+  "name": "toxichain-moderator",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Fail-closed EIP-712 moderation attester for ToxiChain",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/pipeline.test.js"
+  },
+  "dependencies": {
+    "@tensorflow-models/toxicity": "^1.2.2",
+    "@tensorflow/tfjs": "^4.22.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "ethers": "^6.15.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1"
+  }
+}
