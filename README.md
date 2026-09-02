@@ -1,258 +1,252 @@
-# ToxiChain AI
+# ToxiChain
 
-A decentralized application (dApp) that prevents toxic or offensive content from being permanently stored on the blockchain using real-time AI content moderation.
+Tablón de mensajes **on-chain** con moderación previa. Un mensaje solo llega a Ethereum cuando un servicio de moderación autorizado firma una **attestation EIP-712**. El filtrado en el navegador **no** es un perímetro de seguridad.
 
-## Overview
+ToxiChain is a moderated on-chain message board: the contract accepts `postMessage` only with a fresh attester signature. Client-side TensorFlow.js is a UX hint, not enforcement.
 
-**ToxiChain AI** is a decentralized application (dApp) that detects and filters toxic or offensive messages in real time before they are written to the blockchain.
+Licencia: [GNU GPL-3.0](LICENSE).
 
-The system combines AI-based sentiment analysis using TensorFlow.js toxicity model with a smart contract on Ethereum, developed in Solidity and deployed locally via Hardhat.
+## Por qué el modelo v1 (solo cliente) era inseguro
 
-Each message submitted through the web interface is first evaluated by an AI filter (English + Spanish, including obfuscated patterns and leetspeak), and only non-offensive content is allowed to be stored immutably on-chain.
+La versión anterior ejecutaba TensorFlow.js y listas de palabras **en el navegador** y, si la UI aprobaba el texto, llamaba a `MiContrato.setMensaje`. Cualquiera podía ignorar esa UI:
 
-## How It Works
+- Llamar a `setMensaje` desde Remix, `cast`, o un script de ethers.
+- Editar o rehacer la página para saltarse `shouldBlockMessageBySentiment`.
+- El contrato no conocía un *attester*: aceptaba cualquier string dentro del límite de longitud.
 
-ToxiChain AI implements a **client-side filtering architecture** that processes all content locally in the user's browser before any blockchain interaction:
+El filtrado client-side no es enforcement. Los datos on-chain son públicos y permanentes; un bypass queda grabado para siempre.
 
-1. **Text Normalization**: Input is normalized (lowercase, accent removal, leetspeak conversion) to detect obfuscated patterns
-2. **AI Toxicity Detection**: TensorFlow.js toxicity model analyzes the message client-side (no data sent to external servers)
-3. **Pattern Matching**: Custom filters detect profanity in English and Spanish, including obfuscated variations
-4. **Blockchain Submission**: Only approved messages proceed to MetaMask for transaction signing
-5. **Immutable Storage**: Valid messages are stored on the Ethereum blockchain via Solidity smart contract
+Carpetas y flujos que **ya no existen** (aparecían en READMEs antiguos):
 
-**Key Advantage**: All content analysis happens **client-side**, meaning user data never leaves their browser until approved for blockchain storage. This provides significant privacy and compliance benefits.
+- `working-dapp/` — no hagas `git clone … && cd working-dapp`.
+- `contrato/` — el Solidity vive en `contracts/`.
+- Hardcodear `const contractAddress = "0x…"` en `frontend/index.html` — el cliente Vite lee `VITE_CONTRACT_ADDRESS`.
 
-## Use Cases
+## Arquitectura
 
-### Content Moderation for Decentralized Platforms
-- **Decentralized Social Networks**: Filter toxic content before permanent on-chain storage
-- **DAO Governance**: Ensure respectful discourse in proposal discussions
-- **NFT Marketplaces**: Moderate user-generated content and descriptions
-- **Blockchain Messaging Apps**: Prevent harassment and abuse in Web3 communication
-- **Chatbot dApps**: Moderate user inputs and responses in decentralized chatbot applications, ensuring appropriate interactions
-
-### Transaction & Data Filtering
-- **Transaction Names/Descriptions**: Filter inappropriate content in transaction memos, notes, and descriptions before on-chain storage
-- **Bizum Transaction Names**: Moderate transaction names and descriptions in Bizum-style payment systems to ensure professional communication
-- **Payment Memos**: Filter inappropriate content in payment transaction descriptions and notes
-- **Smart Contract Events**: Moderate event logs and metadata to prevent toxic content in blockchain events
-- **Wallet Labels**: Ensure appropriate naming for wallet addresses and transaction labels
-- **On-Chain Comments**: Filter user comments and annotations attached to blockchain transactions
-
-### Compliance & Privacy
-- **GDPR Compliance**: Client-side filtering means no personal data is processed by third-party servers
-- **Data Minimization**: Only approved content reaches the blockchain, reducing unnecessary on-chain data
-- **User Privacy**: Content analysis happens locally, protecting user data from external exposure
-
-### Enterprise Applications
-- **Internal Blockchain Systems**: Moderate communications in private blockchain networks
-- **Supply Chain Documentation**: Ensure professional communication in blockchain-based supply chains
-- **Healthcare Records**: Filter inappropriate content in patient communication systems
-
-## GDPR Compliance & Privacy Benefits
-
-**Client-side filtering provides significant advantages for GDPR compliance:**
-
-✅ **Data Minimization**: Content is analyzed locally before submission, reducing unnecessary data processing
-
-✅ **No Third-Party Processing**: User messages are never sent to external AI services or servers for analysis
-
-✅ **User Control**: Users can see exactly what filtering is applied before submission
-
-✅ **Reduced Data Exposure**: Only approved content reaches the blockchain, minimizing on-chain data footprint
-
-✅ **Privacy by Design**: All toxicity detection happens in the browser, ensuring user privacy
-
-This architecture ensures that sensitive or inappropriate content is filtered **before** it becomes part of the immutable blockchain record, protecting both users and the integrity of on-chain data.
-
-## Architecture
-
-The following diagram illustrates how ToxiChain AI processes messages before blockchain submission:
-
-![ToxiChain AI Architecture](images/ToxiChain.jpg)
-
-**Flow:**
-1. User submits message through browser interface
-2. Frontend normalizes text (lowercase, accents, leetspeak detection)
-3. TensorFlow.js toxicity model analyzes content (client-side)
-4. If approved, MetaMask signs transaction via Ethers.js
-5. Smart contract stores message on blockchain (Hardhat network)
-
-## Features
-
-- ✅ **AI-Powered Content Moderation**: Real-time toxicity detection using TensorFlow.js (client-side)
-- ✅ **Privacy-First Architecture**: All content analysis happens locally in the browser (GDPR compliant)
-- ✅ **Multi-Language Support**: English + Spanish profanity filtering
-- ✅ **Advanced Pattern Detection**: Handles obfuscated text and leetspeak
-- ✅ **Blockchain Integration**: Ethereum smart contract for immutable message storage
-- ✅ **MetaMask Wallet**: Seamless Web3 wallet connectivity
-- ✅ **Responsive UI**: Modern, user-friendly interface
-
-## Examples
-
-### AI Filter in Action
-
-The system successfully blocks toxic content before it reaches the blockchain:
-
-![AI Filter Blocking Toxic Content](images/example-filter-blocking.png)
-
-*Example: The AI filter detected and blocked an offensive message (e.g., "maricon", "motherfucker"), preventing it from being stored on-chain. The interface displays: "Please rephrase your message to be more constructive (AI filter)."*
-
-### Successful Transaction
-
-When content passes the AI filter, users can submit messages via MetaMask:
-
-![MetaMask Transaction](images/example-metamask-transaction.png)
-
-*Example: A valid message transaction being signed through MetaMask on the Hardhat network. The transaction shows the contract address, function call (`setMensaje`), and network fee (0 ETH on testnet).*
-
-## Tech Stack
-
-🔹 **Tech stack**: TensorFlow.js · Solidity · Hardhat · MetaMask · Ethers.js · HTML/CSS/JS
-
-## Innovation
-
-🔹 **Innovation**: Bridges AI moderation and decentralized ledgers, demonstrating how responsible GenAI can enhance Web3 trust and compliance. This project showcases the integration of AI content filtering at the application layer to prevent inappropriate content from being permanently stored on immutable blockchains.
-
-**Key Innovation**: Client-side AI filtering ensures privacy and GDPR compliance while maintaining the security and immutability benefits of blockchain technology.
-
-## Project Structure
-
-```
-working-dapp/
-├── contracts/
-│   └── MiContrato.sol          # Solidity smart contract
-├── frontend/
-│   └── index.html              # Web interface with AI filtering
-├── images/                     # Documentation images
-│   ├── architecture-flow.png   # System architecture diagram
-│   └── example-*.png           # Example screenshots
-├── scripts/
-│   ├── deploy.js               # Deployment script
-│   └── check-contract.js       # Contract verification script
-├── test/
-│   └── Lock.js                 # Test files
-├── hardhat.config.js            # Hardhat configuration
-└── package.json                # Dependencies
+```mermaid
+flowchart LR
+  user[User / wallet] --> ui[React frontend]
+  ui -->|POST /moderate content + author| mod[Moderator service]
+  mod -->|Unicode + leetspeak + EN/ES word list| det[Deterministic filter]
+  det -->|pass| tf[TensorFlow.js toxicity]
+  det -->|reject| deny[HTTP 403]
+  tf -->|pass| eip[EIP-712 sign with attester key]
+  tf -->|reject| deny
+  eip -->|signature nonce deadline| ui
+  ui -->|postMessage content nonce deadline signature| chain[ModeratedBoard]
+  chain -->|recover signer == attester| ev[MessagePosted event]
 ```
 
-## Quick Start
+El contrato **nunca** confía en el browser. Recupera el firmante de la firma EIP-712 sobre `(content, author, nonce, deadline)` y el dominio (`name: ModeratedBoard`, `version: 1`, `chainId`, `address(this)`). `author` es `msg.sender`. Sin una attestation fresca, `postMessage` revierte.
 
-### Prerequisites
+El cuerpo del mensaje **no** se guarda en storage: se emite en `MessagePosted` (máximo 512 bytes) para que indexers y el frontend reconstruyan el feed.
 
-- Node.js (v18+ recommended)
-- MetaMask browser extension
+## Modelo de seguridad
 
-### Installation
+| Control | Dónde | Efecto |
+| --- | --- | --- |
+| Filtro determinista (NFKC, homoglifos, leetspeak, listas EN/ES) | Moderator | Rechazo rápido, sin firma |
+| TensorFlow.js toxicity | Moderator | Segunda capa; umbral en `TOXICITY_THRESHOLD` |
+| Attestation EIP-712 | El moderator firma; el contrato verifica | Solo `attester` puede aprobar un payload |
+| Nonce + deadline | Contrato | Bloquea replay y attestations caducadas |
+| Binding de `chainId` + `address(this)` | Dominio EIP-712 | Una firma de otra chain u otro board no vale |
+| UI fail-closed | Frontend | Si `/moderate` cae o hace timeout: **contenido no verificado** y no se envía `postMessage` |
+| Historial por eventos | Contrato | El contenido se emite, no se almacena (acota SSTORE / gas) |
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd working-dapp
-   ```
+La clave `ATTESTER_PRIVATE_KEY` vive solo en el proceso del moderator. **Nunca** se envía al frontend ni se commitea a git. **Nunca** subas `.env` ni claves.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Threat model
 
-3. **Start local blockchain (Terminal 1)**
-   ```bash
-   npx hardhat node
-   ```
+**En alcance**
 
-4. **Deploy contract (Terminal 2)**
-   ```bash
-   npx hardhat run scripts/deploy.js --network localhost
-   ```
+- Usuarios que llaman al contrato directo para saltarse el filtro del browser (el caso que rompía v1).
+- Reutilizar una attestation válida para otro mensaje, nonce, chain o board.
+- Usar una attestation caducada (`deadline`).
+- Compromiso de la clave attester: el *owner* puede rotarla con `setAttester`.
+- Timeout o crash del moderator (fail-closed: no hay post).
 
-5. **Update frontend with contract address** ⚠️ **REQUIRED**
-   - Copy the deployed contract address from the deployment output (e.g., `Contrato desplegado en: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`)
-   - Open `frontend/index.html` in a text editor
-   - Find the line: `const contractAddress = "0x...";` (around line 142)
-   - Replace the address with your deployed contract address
-   - Save the file
+**Fuera de alcance / riesgo residual**
 
-   **Why this is important:** The frontend contract address **must match** the deployed contract address. If they don't match, you'll get errors like "could not decode result data" or "BAD_DATA" when trying to interact with the contract.
+- Un attester malicioso o coaccionado **puede** firmar contenido tóxico. La seguridad operativa de esa clave es la raíz de confianza.
+- El modelo de toxicity tiene falsos negativos; la word list no es un modelo de lenguaje completo.
+- Los event logs publican el plaintext aceptado. No publiques secretos.
+- La disponibilidad del moderator es una dependencia de liveness (es intencional: no publicar es más seguro que publicar sin verificar).
+- **`MiContrato` sigue siendo bypasseable.** `contracts/MiContrato.sol` es el leftover de v1: `setMensaje` es público y no pide attestation. Si alguien lo despliega o apunta un cliente a esa dirección, la moderación no existe. El board soportado es **solo** `ModeratedBoard`.
 
-6. **Open the dApp**
-   - Open `frontend/index.html` in your browser
-   - Connect MetaMask to localhost network (Chain ID: 31337)
-   - Import a test account from the Hardhat node output
+## Prerrequisitos
 
-## Usage
+- Node.js 18+ (20 recomendado)
+- npm
+- [MetaMask](https://metamask.io/)
+- Para Sepolia: un RPC (`SEPOLIA_RPC_URL`) y una clave de deployer con ETH de testnet (`SEPOLIA_PRIVATE_KEY`)
 
-1. **View Current Message**: Click "View current message" to read the message stored on the blockchain
-2. **Update Message**: Enter a new message and click "Send" to update the contract
-3. **AI Filtering**: The system automatically filters toxic or offensive content before submission
+## Instalación
 
-## MetaMask Configuration
+```bash
+git clone https://github.com/tshapedconsultant/Toxichain.git
+cd Toxichain
+npm install
+npm install --prefix moderator
+npm install --prefix frontend
+```
 
-**Network Settings:**
-- Network Name: `Hardhat Local`
-- RPC URL: `http://127.0.0.1:8545`
+Copia las plantillas de entorno. En PowerShell:
+
+```powershell
+copy .env.example .env
+copy frontend\.env.example frontend\.env
+```
+
+En macOS / Linux: `cp .env.example .env` y `cp frontend/.env.example frontend/.env`.
+
+Rellena `.env` y `frontend/.env` **en local**. No commitees esos archivos. No uses un mnemonic de mainnet.
+
+## Demo local
+
+Cuatro terminales. Tras cambiar `frontend/.env`, reinicia Vite: las variables `VITE_*` se leen al arrancar.
+
+**Terminal 1 — cadena Hardhat**
+
+```bash
+npm run node
+```
+
+Deja el nodo en `http://127.0.0.1:8545` (chainId `31337`). Copia la **Account #0** (dirección y private key) del output: por defecto el deploy usa esa cuenta como *attester*.
+
+**Terminal 2 — deploy de `ModeratedBoard`**
+
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+Si no hay `ATTESTER_ADDRESS` en `.env`, el attester es el primer signer de Hardhat. Copia la dirección impresa a:
+
+| Archivo | Variable |
+| --- | --- |
+| `.env` | `CONTRACT_ADDRESS` |
+| `.env` | `ATTESTER_ADDRESS` (la que imprimió el script) |
+| `.env` | `ATTESTER_PRIVATE_KEY` (la private key de **esa** cuenta, p. ej. Account #0 del nodo) |
+| `.env` | `CHAIN_ID=31337` |
+| `frontend/.env` | `VITE_CONTRACT_ADDRESS` (la misma dirección del contrato) |
+| `frontend/.env` | `VITE_MODERATOR_URL=http://127.0.0.1:3001` |
+| `frontend/.env` | `VITE_CHAIN_ID=31337` |
+
+Esas private keys de Hardhat son públicas y **solo** valen en localhost. Nunca las uses en Sepolia ni en mainnet.
+
+**Terminal 3 — moderator**
+
+```bash
+npm start --prefix moderator
+```
+
+El servicio lee el `.env` de la **raíz** del repo. Arranca en `http://127.0.0.1:3001`. `GET /health` debe devolver el attester y el contrato.
+
+**Terminal 4 — frontend**
+
+```bash
+npm run frontend:dev
+```
+
+Vite sirve en `http://127.0.0.1:5173`. En MetaMask:
+
+- Network name: `Hardhat Local`
+- RPC: `http://127.0.0.1:8545`
 - Chain ID: `31337`
-- Currency Symbol: `ETH`
+- Currency: `ETH`
 
-**Import Test Account:**
-Copy any private key from the Hardhat node terminal output.
+Importa una cuenta de prueba del nodo. **Nunca uses esas keys en una red pública.**
 
-⚠️ **NEVER use test accounts on mainnet!**
+Alternativa con Ignition (local):
 
-## Troubleshooting
-
-### Contract Address Mismatch Error
-
-**Error:** `could not decode result data (value="0x", info={ "method": "mensaje" })` or `BAD_DATA`
-
-**Solution:** The contract address in `frontend/index.html` doesn't match your deployed contract.
-
-1. Deploy the contract: `npx hardhat run scripts/deploy.js --network localhost`
-2. Copy the contract address from the output
-3. Update `frontend/index.html` line 142: `const contractAddress = "YOUR_DEPLOYED_ADDRESS";`
-4. Refresh your browser
-
-**Note:** Each time you restart the Hardhat node, you need to redeploy and update the address. The contract address changes with each new deployment.
-
-### MetaMask Connection Issues
-
-- Ensure you're connected to the Hardhat Local network (Chain ID: 31337)
-- Make sure the Hardhat node is running (`npx hardhat node`)
-- Try resetting your MetaMask account: Settings → Advanced → Reset Account
-
-## Development
-
-### Compile Contracts
 ```bash
-npx hardhat compile
+npx hardhat ignition deploy ignition/modules/ModeratedBoard.js --network localhost
 ```
 
-### Run Tests
+## Deploy en Sepolia
+
+1. Crea un wallet **dedicado** para el attester (no reutilices keys de Hardhat).
+2. En `.env` define `SEPOLIA_RPC_URL`, `SEPOLIA_PRIVATE_KEY` (deployer con ETH de testnet) y `ATTESTER_ADDRESS` (la address de esa clave attester).
+3. Ejecuta `npm run deploy:sepolia`.
+4. El script imprime la dirección y escribe `deployment.json` (está en `.gitignore`; no lo subas si contiene datos que no quieras compartir).
+5. Apunta el resto del entorno a ese deploy:
+
+   - `.env`: `CONTRACT_ADDRESS`, `CHAIN_ID=11155111`, `ATTESTER_PRIVATE_KEY` de la misma address que pasaste al constructor.
+   - `frontend/.env`: `VITE_CONTRACT_ADDRESS`, `VITE_CHAIN_ID=11155111`, `VITE_MODERATOR_URL` (URL pública del moderator, no `127.0.0.1` si el UI no corre en tu máquina).
+
+6. Arranca el moderator con esa misma clave. El contrato solo aceptará firmas de `ATTESTER_ADDRESS`.
+
+## Variables de entorno
+
+Plantillas: [`.env.example`](.env.example) y [`frontend/.env.example`](frontend/.env.example). **No commitees `.env` ni `frontend/.env`.**
+
+### Raíz (Hardhat + moderator)
+
+| Variable | Uso |
+| --- | --- |
+| `ATTESTER_PRIVATE_KEY` | Clave con la que el moderator firma EIP-712. Obligatoria para arrancar el servicio. |
+| `ATTESTER_ADDRESS` | Address de esa clave. Local: opcional (cae al primer signer). Sepolia: **obligatoria**. |
+| `CONTRACT_ADDRESS` | `ModeratedBoard` desplegado. El moderator la usa como `verifyingContract`. |
+| `CHAIN_ID` | Dominio EIP-712. Local `31337`, Sepolia `11155111`. |
+| `PORT` | Puerto HTTP del moderator (default `3001`). |
+| `TOXICITY_THRESHOLD` | Umbral de `@tensorflow-models/toxicity` (default `0.7`). |
+| `MODERATION_TIMEOUT_MS` | Timeout fail-closed del pipeline (default `1800`). |
+| `ATTESTATION_TTL_SECONDS` | Vida del `deadline` (default `300`). |
+| `FRONTEND_ORIGIN` | CORS. Local: `http://127.0.0.1:5173`. |
+| `SKIP_TOXICITY` | `1` solo para depurar el pipeline local **sin** TF.js. En cualquier entorno real debe ser `0`. |
+| `SEPOLIA_RPC_URL` | RPC de Sepolia para Hardhat. |
+| `SEPOLIA_PRIVATE_KEY` | Deployer en Sepolia. Distinta de la attester si puedes. |
+
+### Frontend (`frontend/.env`, prefijo `VITE_`)
+
+| Variable | Uso |
+| --- | --- |
+| `VITE_CONTRACT_ADDRESS` | Mismo `ModeratedBoard` que el moderator. |
+| `VITE_MODERATOR_URL` | Base URL del moderator (sin slash final). Local: `http://127.0.0.1:3001`. |
+| `VITE_CHAIN_ID` | Debe coincidir con la red de MetaMask (`31337` o `11155111`). |
+
+## Scripts
+
+| Script | Qué hace |
+| --- | --- |
+| `npm run compile` | Compila Solidity |
+| `npm test` / `npx hardhat test` | Tests de contratos (incluye `ModeratedBoard` y el leftover `MiContrato`) |
+| `npm run test:moderator` | Pipeline + attestation del moderator |
+| `npm run node` | Nodo Hardhat local |
+| `npm run deploy:sepolia` | Deploy de `ModeratedBoard` y escribe `deployment.json` |
+| `npm run frontend:dev` | Dev server Vite |
+
+Notas de paquetes: [moderator/README.md](moderator/README.md), [frontend/README.md](frontend/README.md).
+
+## Tests
+
 ```bash
+npm test
 npx hardhat test
+npm run test:moderator
 ```
 
-### Clean Build Artifacts
-```bash
-npx hardhat clean
+Los tests del moderator incluyen ≥15 payloads maliciosos (leetspeak, letter-spacing, homoglifos) y ≥15 benignos, e imprimen tasas FP/FN.
+
+CI (GitHub Actions) en PRs y push a `master`/`main`: compile + `npm test` + `npm run test:moderator`.
+
+## Layout
+
 ```
-
-## Role & Implementation
-
-🔹 **Role**: Designed and implemented end-to-end architecture (AI toxicity filter + Solidity contract + front-end integration).
-
-**Implementation Details:**
-- **AI Toxicity Filter**: Client-side TensorFlow.js implementation with multi-language support (English + Spanish)
-- **Smart Contract**: Solidity contract deployed via Hardhat for immutable message storage
-- **Front-End Integration**: Responsive web interface with MetaMask wallet connectivity
-- **Real-Time Moderation**: Content filtering happens before blockchain submission, ensuring only appropriate content is stored on-chain
+Toxichain/
+├── contracts/ModeratedBoard.sol   # Board con attestation (el que debes usar)
+├── contracts/MiContrato.sol       # Leftover v1: setMensaje sin attester
+├── ignition/modules/ModeratedBoard.js
+├── test/ModeratedBoard.js
+├── test/MiContrato.js
+├── moderator/                     # Express attester (fail-closed)
+├── frontend/                      # React + Vite + ethers
+├── scripts/deploy.js              # Deploy local
+├── scripts/deploy-sepolia.js      # Deploy Sepolia → deployment.json
+├── .env.example
+└── frontend/.env.example
+```
 
 ## License
 
-Copyright © 2025 **Andrés Lage** ([tshapedconsultant](https://github.com/tshapedconsultant)). Licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details. Unlike MIT, GPL-3.0 requires derivative works to be distributed under the same license with source available.
-
-
-
----
-
-**Built as a demonstration of AI-powered content moderation in Web3 ecosystems.**
+Copyright © 2025 **Andrés Lage** ([tshapedconsultant](https://github.com/tshapedconsultant)). GNU General Public License v3.0 — ver [LICENSE](LICENSE).

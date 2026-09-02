@@ -1,5 +1,19 @@
 {
-  "name": "hardhat-project",
+  "name": "toxichain",
+  "description": "Moderated message board: EIP-712 attester + Hardhat + Solidity",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:moderator": "npm test --prefix moderator",
+    "node": "hardhat node",
+    "deploy:sepolia": "hardhat run scripts/deploy-sepolia.js --network sepolia",
+    "frontend:dev": "npm run dev --prefix frontend"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "dotenv": "^16.6.1"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.0.0",
     "hardhat": "^2.25.0"

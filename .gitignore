@@ -1,5 +1,9 @@
 node_modules
 .env
+frontend/.env
+
+# Generated deployment addresses (local / Sepolia)
+deployment.json
 
 # Hardhat files
 /cache
@@ -15,3 +19,6 @@ node_modules
 
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
+
+# Frontend build
+frontend/dist

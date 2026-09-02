@@ -1,15 +1,21 @@
-const hre = require('hardhat');
+const hre = require("hardhat");
 
 async function main() {
-    const MiContrato = await hre.ethers.getContractFactory('MiContrato');
-    const contrato = await MiContrato.deploy('Eureka');
+  const [deployer] = await hre.ethers.getSigners();
+  const attester = process.env.ATTESTER_ADDRESS || deployer.address;
+  if (!hre.ethers.isAddress(attester)) {
+    throw new Error("Set ATTESTER_ADDRESS to a valid address.");
+  }
 
-    await contrato.waitForDeployment();
+  const Factory = await hre.ethers.getContractFactory("ModeratedBoard");
+  const board = await Factory.deploy(attester);
+  await board.waitForDeployment();
 
-    console.log(`Contrato desplegado en: ${contrato.target}`);
+  console.log(`ModeratedBoard deployed at: ${board.target}`);
+  console.log(`Attester: ${attester}`);
 }
 
 main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+  console.error(error);
+  process.exitCode = 1;
 });
